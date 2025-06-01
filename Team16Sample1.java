@@ -16,6 +16,12 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import java.util.*;
+
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
+
 public class Team16Sample1 {
 
 	public static void main(String[] args) {
@@ -56,6 +62,23 @@ class MainWindow extends JFrame {
 
 		// lecturepanel(위 - 강의 추가)
 		lecmanager = new LectureManager();
+
+
+		// 프로그램 시작 시 저장된 데이터 불러오기(FileIO)
+        List<Lecture> loaded = FileIO.loadLectures();
+        LectureManager.fromList(lecmanager, loaded);
+        for (int i = 0; i < lecmanager.lecturecnt; i++) {
+            Lecture lec = lecmanager.lecture[i];
+            listModel.addElement(String.format("%-20s %-20s %-10s",
+                lec.getLecturename(), lec.getProfessorname(), lec.getTime()));
+        }
+        // List<AttendanceRecord> attendanceList = FileIO.loadAttendance();
+        // AttendanceManager.setRecords(attendanceList);
+        // Map<String, List<String>> schedules = FileIO.loadSchedule();
+        // ScheduleManager.setScheduleMap(schedules);
+
+
+
 		lecturepanel = new JPanel();
 		lecturepanel.setLayout(new GridLayout(4, 4));
 		lecturepanel.add(new JLabel("Lecture"));
@@ -125,6 +148,19 @@ class MainWindow extends JFrame {
 															// AddListener 클래스에서 정의한 로직이 실행되도록 함.
 		viewbtn.addActionListener(new ViewListener(this)); // viewbtn(버튼) 객체에 Event Listener 등록. 버튼에 클릭 이벤트를 등록하고, 클릭 시
 															// AddListener 클래스에서 정의한 로직이 실행되도록 함.
+
+
+		 //창 닫을 때 데이터 저장(FileIO)
+        this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                List<Lecture> current = LectureManager.toList(lecmanager);
+                FileIO.saveLectures(current);
+                // FileIO.saveAttendance(AttendanceManager.getRecords());
+                // FileIO.saveSchedule(ScheduleManager.getScheduleMap());
+                System.exit(0);
+            }
+        });
 	}
 
 }
@@ -197,6 +233,26 @@ class LectureManager {
 	Lecture[] lecture = new Lecture[10]; // 강의를 리스트로 추가
 	int lecturecnt = 0; // 강의 개수
 
+    //FileIO와 연결
+	// 배열 → 리스트
+    public static List<Lecture> toList(LectureManager mgr) {
+        List<Lecture> temp = new ArrayList<>();
+        for (int i = 0; i < mgr.lecturecnt; i++) {
+            temp.add(mgr.lecture[i]);
+        }
+        return temp;
+    }
+    // 리스트 → 배열
+    public static void fromList(LectureManager mgr, List<Lecture> list) {
+        int size = Math.min(list.size(), mgr.lecture.length);
+        for (int i = 0; i < size; i++) {
+            mgr.lecture[i] = list.get(i);
+        }
+        mgr.lecturecnt = size;
+    }
+
+
+
 	void addLecture(Lecture newLecture) { // 강의명 추가 함수
 		if (lecturecnt < lecture.length) {
 			lecture[lecturecnt++] = newLecture;
@@ -228,24 +284,28 @@ class AddListener implements ActionListener {
 
 	MainWindow win = null;
 
-	public void actionPerformed(ActionEvent e) { // 추가 리스너
+	public void actionPerformed(ActionEvent e) {
 		if (win.lecmanager.lecturecnt < 10) {
-			Lecture lec = new Lecture(win.tflecture.getText(), win.tfprofessor.getText(), win.tftime.getText());
-			win.lecmanager.lecture[win.lecmanager.lecturecnt++] = lec;
-			// JList 모델에 추가
-			win.listModel.addElement(String.format("%-20s %-20s %-10s", lec.lecturename, lec.professorname, lec.time));
-			// 입력 필드 초기화
+			String name = win.tflecture.getText();
+			String prof = win.tfprofessor.getText();
+			String time = win.tftime.getText();
+
+			Lecture lec = new Lecture(name, prof, time);
+
+			win.lecmanager.addLecture(lec);
+			win.listModel.addElement(String.format("%-20s %-20s %-10s", name, prof, time));
 			win.tflecture.setText("");
 			win.tfprofessor.setText("");
-			win.tftime.setText(""); // 다음 강의 입력 위함
+			win.tftime.setText("");
+
+			System.out.println("강의 추가됨: " + name);  //콘솔로 확인인
 		}
 	}
-
 	AddListener(MainWindow w) {
 		win = w;
 	}
-
 }
+
 
 class ViewListener implements ActionListener {
 
@@ -296,16 +356,12 @@ class EditListener implements ActionListener {
 			String newLectureName = win.tflecture.getText();
 			String newProfessorName = win.tfprofessor.getText();
 			String newTime = win.tftime.getText();
-
 			// LectureManager 배열 업데이트
 			win.lecmanager.lecture[selectedIndex].editLecturename(newLectureName);
 			win.lecmanager.lecture[selectedIndex].editProfessorname(newProfessorName);
 			win.lecmanager.lecture[selectedIndex].editTime(newTime);
-
 			// JList 모델 업데이트
 			win.listModel.set(selectedIndex, String.format("%-20s %-20s %-10s", newLectureName, newProfessorName, newTime));
-
-
 			// 입력 필드 초기화
 			win.tflecture.setText("");
 			win.tfprofessor.setText("");
@@ -343,6 +399,7 @@ class DeleteListener implements ActionListener {
 			}
 }
 		
+
 
 // 6월 6일 첫째주 교수님 코멘트 받기(팀별), 16일 오전 9시 기말 발표
 
