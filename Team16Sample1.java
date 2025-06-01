@@ -303,7 +303,8 @@ class EditListener implements ActionListener {
 			win.lecmanager.lecture[selectedIndex].editTime(newTime);
 
 			// JList 모델 업데이트
-			win.listModel.set(selectedIndex, newLectureName + "\t" + newProfessorName + "\t" + newTime);
+			win.listModel.set(selectedIndex, String.format("%-20s %-20s %-10s", newLectureName, newProfessorName, newTime));
+
 
 			// 입력 필드 초기화
 			win.tflecture.setText("");
