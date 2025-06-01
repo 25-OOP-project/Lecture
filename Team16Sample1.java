@@ -1,4 +1,4 @@
-package team16;
+// package team16;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -25,7 +25,8 @@ import java.awt.event.WindowEvent;
 public class Team16Sample1 {
 
 	public static void main(String[] args) {
-		MainWindow win = new MainWindow(); // MainWindow 객체 생성
+		ManagerContainer managers = new ManagerContainer();
+		MainWindow win = new MainWindow(managers); // MainWindow 객체 생성
 		win.setSize(600, 600); // 화면 사이즈
 		win.setVisible(true);
 		win.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // 종료
@@ -35,7 +36,15 @@ public class Team16Sample1 {
 }
 
 class MainWindow extends JFrame {
+
+	//각 기능 Manager 초기화
+	ManagerContainer managers;
 	LectureManager lecmanager = null;
+	AttendanceManager attmanager = null;
+	MemoManager memomanager = null;
+	ScheduleManager schmanager = null;
+
+
 	JPanel menupanel = null;
 	JPanel centerpanel = null;
 	JPanel lecturepanel = null;
@@ -57,11 +66,15 @@ class MainWindow extends JFrame {
 	JList<String> lectureList = null;
 
 	// MainWindow(MainUI)
-	MainWindow() {
+	MainWindow(ManagerContainer managers) {
 		setLayout(new BorderLayout());
 
-		// lecturepanel(위 - 강의 추가)
-		lecmanager = new LectureManager();
+		this.managers=managers;
+		// 각 기능 매니저 받아오기
+		lecmanager = managers.getLectureManager();
+		attmanager = managers.getAttendanceManager();
+		memomanager = managers.getMemoManager();
+		schmanager = managers.getScheduleManager();
 
 
 		// 프로그램 시작 시 저장된 데이터 불러오기(FileIO)
@@ -73,9 +86,9 @@ class MainWindow extends JFrame {
                 lec.getLecturename(), lec.getProfessorname(), lec.getTime()));
         }
         // List<AttendanceRecord> attendanceList = FileIO.loadAttendance();
-        // AttendanceManager.setRecords(attendanceList);
+        // attmanager.setRecords(attendanceList);
         // Map<String, List<String>> schedules = FileIO.loadSchedule();
-        // ScheduleManager.setScheduleMap(schedules);
+        // schmanager.setScheduleMap(schedules);
 
 
 
@@ -150,14 +163,14 @@ class MainWindow extends JFrame {
 															// AddListener 클래스에서 정의한 로직이 실행되도록 함.
 
 
-		 //창 닫을 때 데이터 저장(FileIO)
+		 //창 닫을 때 데이터 저장
         this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
                 List<Lecture> current = LectureManager.toList(lecmanager);
                 FileIO.saveLectures(current);
-                // FileIO.saveAttendance(AttendanceManager.getRecords());
-                // FileIO.saveSchedule(ScheduleManager.getScheduleMap());
+                // FileIO.saveAttendance(attmanager.getRecords());
+                // FileIO.saveSchedule(schmanager.getScheduleMap());
                 System.exit(0);
             }
         });
@@ -233,7 +246,7 @@ class LectureManager {
 	Lecture[] lecture = new Lecture[10]; // 강의를 리스트로 추가
 	int lecturecnt = 0; // 강의 개수
 
-    //FileIO와 연결
+    //fileio와 연결
 	// 배열 → 리스트
     public static List<Lecture> toList(LectureManager mgr) {
         List<Lecture> temp = new ArrayList<>();
