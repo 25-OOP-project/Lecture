@@ -1,4 +1,3 @@
-// package team16;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -21,7 +20,6 @@ import java.util.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-
 public class Team16Sample1 {
 
 	public static void main(String[] args) {
@@ -37,13 +35,12 @@ public class Team16Sample1 {
 
 class MainWindow extends JFrame {
 
-	//각 기능 Manager 초기화
+	// 각 기능 Manager 초기화
 	ManagerContainer managers;
 	LectureManager lecmanager = null;
 	AttendanceManager attmanager = null;
 	MemoManager memomanager = null;
 	ScheduleManager schmanager = null;
-
 
 	JPanel menupanel = null;
 	JPanel centerpanel = null;
@@ -69,28 +66,25 @@ class MainWindow extends JFrame {
 	MainWindow(ManagerContainer managers) {
 		setLayout(new BorderLayout());
 
-		this.managers=managers;
+		this.managers = managers;
 		// 각 기능 매니저 받아오기
 		lecmanager = managers.getLectureManager();
 		attmanager = managers.getAttendanceManager();
 		memomanager = managers.getMemoManager();
 		schmanager = managers.getScheduleManager();
 
-
 		// 프로그램 시작 시 저장된 데이터 불러오기(FileIO)
-        List<Lecture> loaded = FileIO.loadLectures();
-        LectureManager.fromList(lecmanager, loaded);
-        for (int i = 0; i < lecmanager.lecturecnt; i++) {
-            Lecture lec = lecmanager.lecture[i];
-            listModel.addElement(String.format("%-20s %-20s %-10s",
-                lec.getLecturename(), lec.getProfessorname(), lec.getTime()));
-        }
-        // List<AttendanceRecord> attendanceList = FileIO.loadAttendance();
-        // attmanager.setRecords(attendanceList);
-        // Map<String, List<String>> schedules = FileIO.loadSchedule();
-        // schmanager.setScheduleMap(schedules);
-
-
+		List<Lecture> loaded = FileIO.loadLectures();
+		LectureManager.fromList(lecmanager, loaded);
+		for (int i = 0; i < lecmanager.lecturecnt; i++) {
+			Lecture lec = lecmanager.lecture[i];
+			listModel.addElement(String.format("%-20s %-20s %-10s",
+					lec.getLecturename(), lec.getProfessorname(), lec.getTime()));
+		}
+		// List<AttendanceRecord> attendanceList = FileIO.loadAttendance();
+		// attmanager.setRecords(attendanceList);
+		// Map<String, List<String>> schedules = FileIO.loadSchedule();
+		// schmanager.setScheduleMap(schedules);
 
 		lecturepanel = new JPanel();
 		lecturepanel.setLayout(new GridLayout(4, 4));
@@ -162,18 +156,17 @@ class MainWindow extends JFrame {
 		viewbtn.addActionListener(new ViewListener(this)); // viewbtn(버튼) 객체에 Event Listener 등록. 버튼에 클릭 이벤트를 등록하고, 클릭 시
 															// AddListener 클래스에서 정의한 로직이 실행되도록 함.
 
-
-		 //창 닫을 때 데이터 저장
-        this.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                List<Lecture> current = LectureManager.toList(lecmanager);
-                FileIO.saveLectures(current);
-                // FileIO.saveAttendance(attmanager.getRecords());
-                // FileIO.saveSchedule(schmanager.getScheduleMap());
-                System.exit(0);
-            }
-        });
+		// 창 닫을 때 데이터 저장
+		this.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				List<Lecture> current = LectureManager.toList(lecmanager);
+				FileIO.saveLectures(current);
+				// FileIO.saveAttendance(attmanager.getRecords());
+				// FileIO.saveSchedule(schmanager.getScheduleMap());
+				System.exit(0);
+			}
+		});
 	}
 
 }
@@ -246,25 +239,24 @@ class LectureManager {
 	Lecture[] lecture = new Lecture[10]; // 강의를 리스트로 추가
 	int lecturecnt = 0; // 강의 개수
 
-    //fileio와 연결
+	// fileio와 연결
 	// 배열 → 리스트
-    public static List<Lecture> toList(LectureManager mgr) {
-        List<Lecture> temp = new ArrayList<>();
-        for (int i = 0; i < mgr.lecturecnt; i++) {
-            temp.add(mgr.lecture[i]);
-        }
-        return temp;
-    }
-    // 리스트 → 배열
-    public static void fromList(LectureManager mgr, List<Lecture> list) {
-        int size = Math.min(list.size(), mgr.lecture.length);
-        for (int i = 0; i < size; i++) {
-            mgr.lecture[i] = list.get(i);
-        }
-        mgr.lecturecnt = size;
-    }
+	public static List<Lecture> toList(LectureManager mgr) {
+		List<Lecture> temp = new ArrayList<>();
+		for (int i = 0; i < mgr.lecturecnt; i++) {
+			temp.add(mgr.lecture[i]);
+		}
+		return temp;
+	}
 
-
+	// 리스트 → 배열
+	public static void fromList(LectureManager mgr, List<Lecture> list) {
+		int size = Math.min(list.size(), mgr.lecture.length);
+		for (int i = 0; i < size; i++) {
+			mgr.lecture[i] = list.get(i);
+		}
+		mgr.lecturecnt = size;
+	}
 
 	void addLecture(Lecture newLecture) { // 강의명 추가 함수
 		if (lecturecnt < lecture.length) {
@@ -311,14 +303,14 @@ class AddListener implements ActionListener {
 			win.tfprofessor.setText("");
 			win.tftime.setText("");
 
-			System.out.println("강의 추가됨: " + name);  //콘솔로 확인인
+			System.out.println("강의 추가됨: " + name); // 콘솔로 확인인
 		}
 	}
+
 	AddListener(MainWindow w) {
 		win = w;
 	}
 }
-
 
 class ViewListener implements ActionListener {
 
@@ -374,7 +366,8 @@ class EditListener implements ActionListener {
 			win.lecmanager.lecture[selectedIndex].editProfessorname(newProfessorName);
 			win.lecmanager.lecture[selectedIndex].editTime(newTime);
 			// JList 모델 업데이트
-			win.listModel.set(selectedIndex, String.format("%-20s %-20s %-10s", newLectureName, newProfessorName, newTime));
+			win.listModel.set(selectedIndex,
+					String.format("%-20s %-20s %-10s", newLectureName, newProfessorName, newTime));
 			// 입력 필드 초기화
 			win.tflecture.setText("");
 			win.tfprofessor.setText("");
@@ -389,33 +382,26 @@ class EditListener implements ActionListener {
 }
 
 class DeleteListener implements ActionListener {
-			
-			MainWindow win = null;
-			
-			public void actionPerformed(ActionEvent e) {	//삭제 리스너
-				int selectedIndex = win.lectureList.getSelectedIndex();
-				if (selectedIndex != -1) {
-		          // 모델에서 제거
-		          win.listModel.remove(selectedIndex);
-		          // LectureManager 배열에서도 삭제 (간단하게 구현)
-		          for (int i = selectedIndex; i < win.lecmanager.lecturecnt - 1; i++) {
-		              win.lecmanager.lecture[i] = win.lecmanager.lecture[i + 1];
-		          }
-		          win.lecmanager.lecture[win.lecmanager.lecturecnt - 1] = null;
-		          win.lecmanager.lecturecnt--;
-		      }
-			}
-			
-			DeleteListener (MainWindow w)
-			{
-				win = w;
-			}
-}
-		
 
+	MainWindow win = null;
+
+	public void actionPerformed(ActionEvent e) { // 삭제 리스너
+		int selectedIndex = win.lectureList.getSelectedIndex();
+		if (selectedIndex != -1) {
+			// 모델에서 제거
+			win.listModel.remove(selectedIndex);
+			// LectureManager 배열에서도 삭제 (간단하게 구현)
+			for (int i = selectedIndex; i < win.lecmanager.lecturecnt - 1; i++) {
+				win.lecmanager.lecture[i] = win.lecmanager.lecture[i + 1];
+			}
+			win.lecmanager.lecture[win.lecmanager.lecturecnt - 1] = null;
+			win.lecmanager.lecturecnt--;
+		}
+	}
+
+	DeleteListener(MainWindow w) {
+		win = w;
+	}
+}
 
 // 6월 6일 첫째주 교수님 코멘트 받기(팀별), 16일 오전 9시 기말 발표
-
-
-
-
